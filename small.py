@@ -94,7 +94,7 @@ plt.show()
 
 # ########### Step D ############
 # 1) Oversample to fix imbalance
-
+# 1.5) Try normalizing the data too, they mention it in a notbook
 neighbors = list(range(1, 20, 2))
 n_components = list(range(1,20, 1))
 
