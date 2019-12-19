@@ -35,6 +35,9 @@ data = pd.read_csv(data_filepath, header=None, na_values=['?']) #comment
 #data = pd.read_pickle('data')
 # Split labels and features
 X, y = data.iloc[:, :-1], data.iloc[:, -1]
+labels = y.unique()
+label_frequencies = y.value_counts(normalize=True)
+print(len(label_frequencies))
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.20, random_state=42069)
 imr = SimpleImputer(missing_values=np.NaN, strategy='mean')
@@ -50,9 +53,9 @@ knn_preds = knn.predict(X_test)
 #print(classification_report(y_test, knn_preds))
 
 # Dummy classifier
-dc_stratified = DummyClassifier(strategy="stratified")
-dc_stratified.fit(X_train, y_train)
-dc_y_pred = dc_stratified.predict(X_test)
+dummy = DummyClassifier(strategy="stratified")
+dummy.fit(X_train, y_train)
+dc_y_pred = dummy.predict(X_test)
 #print(classification_report(y_test,dc_y_pred))
 
 # Gaussian naive Bayes
@@ -92,10 +95,21 @@ print(np.max(train_variance))
 vthreshold = [0, 0.3, 0.6, 0.9] #προσαρμόζουμε τις τιμές μας στο variance που παρατηρήσαμε
 n_components = [2, 4, 6, 8, 9, 10] #PCA Parameter
 k = [1, 3, 5, 7, 9, 11] # η υπερπαράμετρος του ταξινομητή KNN
-layers = [2,3,4,5] # η υπερπαράμετρος του ταξινομητή MLP 
+layers = [2,3,4,5] # η υπερπαράμετρος του ταξινομητή MLP
+#class_probs = [None,[label_frequencies[i] for i in range(len(label_frequencies))]] 
 
+pipe_dummy = Pipeline(steps=[('selector', selector), ('scaler', scaler), ('sampler', ros), 
+                       ('pca', pca), ('dummy', dummy)], memory = 'tmp')
+estimator_gnb = GridSearchCV(pipe_dummy, dict(selector__threshold=vthreshold, 
+                                    pca__n_components=n_components), 
+cv=5, scoring='f1_macro', n_jobs=-1)
 
-classifiers = {}
+pipe_gnb = Pipeline(steps=[('selector', selector), ('scaler', scaler), ('sampler', ros), 
+                       ('pca', pca), ('gnb', gnb)], memory = 'tmp')
+estimator_gnb = GridSearchCV(pipe_gnb, dict(selector__threshold=vthreshold, 
+                                    pca__n_components=n_components), 
+cv=5, scoring='f1_macro', n_jobs=-1)
+
 pipe_knn = Pipeline(steps=[('selector', selector), ('scaler', scaler), ('sampler', ros), 
                        ('pca', pca), ('kNN', knn)], memory = 'tmp')
 estimator_knn = GridSearchCV(pipe_knn, dict(selector__threshold=vthreshold, 
@@ -108,7 +122,7 @@ estimator_mlp = GridSearchCV(pipe_mlp, dict(selector__threshold=vthreshold,
                                     pca__n_components=n_components, mlp__hidden_layer_sizes=layers),
 cv=5, scoring='f1_macro', n_jobs=-1)
 
-for estimator_name in ['estimator_knn','estimator_mlp']:
+for estimator_name in ['estimator_knn','estimator_mlp','estimator_gnb']:
     estimator = eval(estimator_name)
     print('for estimator %s' %(estimator_name))    
     start_time = time.time()
@@ -120,4 +134,5 @@ for estimator_name in ['estimator_knn','estimator_mlp']:
     print(estimator.best_estimator_)
     print()
     print(estimator.best_params_)
+    
 
