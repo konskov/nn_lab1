@@ -65,5 +65,10 @@ nsm_mapping = {'n': 0, 's': 1, 'm': 2}
 data = data.applymap(lambda s: nsm_mapping.get(s) if s in nsm_mapping else s)
 
 #done preprocessing
+train_variance = X_train.var(axis=0)
+print(np.sort(train_variance))
+print(np.min(train_variance))
+print(np.max(train_variance)) #0.18
+print(np.mean(train_variance)) #0.0405
 
 

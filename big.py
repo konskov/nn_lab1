@@ -80,10 +80,10 @@ print(np.mean(train_variance))
 print(np.min(train_variance))
 print(np.max(train_variance))'''
 
-vthreshold = [0, 0.3, 0.6, 0.9] #προσαρμόζουμε τις τιμές μας στο variance που παρατηρήσαμε
-n_components = [2, 4, 6, 8, 9, 10] #PCA Parameter
-k = [1, 3, 5, 7, 9, 11] # η υπερπαράμετρος του ταξινομητή KNN
-layers = [2,3,4,6] # η υπερπαράμετρος του ταξινομητή MLP
+vthreshold = [0, 0.004, 0.02, 0.05] #προσαρμόζουμε τις τιμές μας στο variance που παρατηρήσαμε
+n_components = [4, 8, 12, 15, 20, 25] #PCA Parameter
+k = [1, 5, 9, 13, 17, 21] # η υπερπαράμετρος του ταξινομητή KNN
+layers = [3,5,9,13] # η υπερπαράμετρος του ταξινομητή MLP
 #class_probs = [None,[label_frequencies[i] for i in range(len(label_frequencies))]] 
 
 pipe_dummy = Pipeline(steps=[('selector', selector), ('scaler', scaler), ('sampler', ros), 
