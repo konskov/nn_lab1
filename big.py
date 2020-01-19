@@ -123,4 +123,4 @@ for estimator_name in ['estimator_knn','estimator_mlp','estimator_gnb','estimato
     print()
     print(estimator.best_params_)
     
-
+print('ntina eisai poly gamath')
